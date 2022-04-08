@@ -1,0 +1,117 @@
+---
+title: "PSTAT131 HW1"
+author: "Tianhong Liu"
+date: "4/3/2022"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE,
+                      warning = FALSE)
+```
+
+#### Question 1: Define supervised and unsupervised learning. What are the difference(s) between them?
+
+Supervised learning is a type of machine learning where we have the actual data Y as the supervisor of our model. Unsupervised learning is another type of machine learning where we don't have the actual data Y, the supervisor. The difference between the two is whether we have the response variable Y in the data as the supervisor.
+
+#### Question 2: Explain the difference between a regression model and a classification model, specifically in the context of machine learning.
+
+A regression model is a machine learning model where the response variable Y is quantitative, which means it has numerical values. For example, Y could be prices, blood pressures, or temperatures. A classification model is a machine learning model where the response variable Y is qualitative, which means it only presents categorical values. For example, Y could be weather, survivied/died, or spam/not spam.
+
+#### Question 3: Name two commonly used metrics for regression ML problems. Name two commonly used metrics for classification ML problems.
+
+For regression ML problems, two commonly used metrics are MSE(mean square error) and MAE(mean absolute error). For classification ML problems, two commonly used metrics are error rate and F-score.
+
+#### Question 4: As discussed, statistical models can be used for different purposes. These purposes can generally be classified into the following three categories. Provide a brief description of each.
+
+Descriptive models: Descriptive models are used to describe the trend of data. We choose models that could best visually emphasize the trend of data such as using a line on a scatterplot.
+
+Inferential models: Inferential models are used to state the relationship between outcome and predictors. These models emphasize on testing which features in data are significant. 
+
+Predictive models: Predictive models are used to predict the response variable Y with minimum reducible error. 
+
+#### Question 5: Predictive models are frequently used in machine learning, and they can usually be described as either mechanistic or empirically-driven. Answer the following questions.
+
+##### Define mechanistic. Define empirically-driven. How do these model types differ? How are they similar?
+
+In mechanistic models, we assume a parametric form for f, where f is the relationship between predictors and the response variable. This relationship won't match true unknown f, and we can add parameters to increase flexibility. In empirically-driven models, also called non-parametric models, we have no assumptions about f. Instead, these models require a larger number of observations and they are much more flexible than mechanistic models by default. Both types of models could have overfitting problems when we have too many parameters.
+
+##### In general, is a mechanistic or empirically-driven model easier to understand? Explain your choice.
+
+In general, a mechanistic model is easier to understand since we assume a parametric form of f and then fit predictors and the response variable in f with inreducible error.
+
+##### Describe how the bias-variance tradeoff is related to the use of mechanistic or empirically-driven models.
+
+The bias-variance tradeoff states that when we have mechanistic or empirically-driven models 
+
+#### Question 6: A political candidate’s campaign has collected some detailed voter history data from their constituents. The campaign is interested in two questions: Given a voter’s profile/data, how likely is it that they will vote in favor of the candidate? How would a voter’s likelihood of support for the candidate change if they had personal contact with the candidate? Classify each question as either predictive or inferential. Explain your reasoning for each.
+
+The first question is predictive. In a predictive model, we are give some data and we want to describe the trend of data. In the first question, we are given a voter's profile/data and try to find the trend of the vote, and thus it is predictive. The second question is inferential. In a inferential model, we state the relationship between the outcome and predictors. In the second question, we would like to know the relationship between voter's likelihood and their personal contacts with the candidate. Thus, it is inferential.
+
+#### Exercise 1: We are interested in highway miles per gallon, or the hwy variable. Create a histogram of this variable. Describe what you see/learn.
+
+```{r}
+# load packages
+library(tidyverse)
+library(tidymodels)
+library(ISLR)
+# create a histogram of the variable hwy
+hist(mpg$hwy, main = "Histogram of Highway Miles per Gallon", xlab = "Highway Miles per Gallon")
+```
+
+
+From the graph, we can see that the histogram is right skewed. Most data lies in the range 15 to 20 and 25 to 30. 
+
+#### Exercise 2: Create a scatterplot. Put hwy on the x-axis and cty on the y-axis. Describe what you notice. Is there a relationship between hwy and cty? What does this mean?
+
+```{r}
+ggplot(mpg, aes(x = hwy, y = cty)) +
+  geom_point() +
+  labs(title = "Scatterplot of Highway Miles per Gallon against City Miles per Gallon",
+       x = "Highway Miles per Gallon",
+       y = "City Miles per Gallon")
+```
+
+I noticed that dots in the scatterplot seem to have a pattern. There might be a positive linear relationship between highway miles per gallon and city miles per gallon. This means a car that has more highway miles per gallon usually will have more city miles per gallon, and vice-versa.
+
+#### Make a bar plot of manufacturer. Flip it so that the manufacturers are on the y-axis. Order the bars by height. Which manufacturer produced the most cars? Which produced the least?
+
+```{r}
+data_1 <- mpg %>% 
+  group_by(manufacturer) %>%
+  summarise(total_num = n()) %>%
+  arrange(desc(total_num))
+ggplot(data_1, aes(x = total_num, y = reorder(manufacturer, total_num))) + 
+  geom_bar(stat = 'identity')
+```
+
+From the graph, we know that Dodge produced the most cars and Lincoln produced the least.
+
+#### Make a box plot of hwy, grouped by cyl. Do you see a pattern? If so, what?
+
+```{r}
+mpg %>%
+  ggplot(aes(x = hwy, y = reorder(cyl, hwy))) + 
+  geom_boxplot() + 
+  labs(x = "Highway Miles per Gallon", y = "Number of Cylinders")
+```
+
+We can see that in average cars that have less number of cylinders usually have more highway miles per gallon.
+
+
+#### Exercise 5: Use the corrplot package to make a lower triangle correlation matrix of the mpg dataset. Which variables are positively or negatively correlated with which others? Do these relationships make sense to you? Are there any that surprise you?
+
+```{r}
+library(corrplot)
+mpg %>% 
+  select(is.numeric) %>%
+  cor() %>%
+  corrplot(type = 'lower', diag = FALSE, 
+          method = 'color')
+```
+
+From the graph we see that city miles per gallon is negatively correlated to engine displacement and number of cylinders; highway miles per gallon is negatively correlated to engine displacement and number of cylinders; these relations make sense to me because usually a car with low engine displacement and number of cylinders has high fuel consumption rate. Number of cylinders is positively correlated to engine displacement and city miles per gallon is positively correlated to highway miles per gallon. 
+
